@@ -1,0 +1,6 @@
+{
+  "name": "Quit Smoking Tracker",
+  "description": "A gorgeous single-screen offline quit-smoking tracker with live health progress bars, craving logs, setting management, and an interactive deep-breathing guide.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
