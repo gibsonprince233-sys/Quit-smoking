@@ -107,6 +107,9 @@ fun QuitSmokingDashboard(
                     // 2. Active stopwatch/timer card
                     StopwatchCard(timeComponents = timeComponents)
 
+                    // Daily Motivational Quote Rotator
+                    MotivationalQuoteCard()
+
                     // 3. Health & Savings Stats Cards
                     StatsSummaryGrid(
                         stats = stats,
@@ -1582,6 +1585,138 @@ fun AdMobBanner(modifier: Modifier = Modifier) {
                     }
                 }
             )
+        }
+    }
+}
+
+data class Quote(val text: String, val author: String)
+
+val smokeFreeQuotes = listOf(
+    Quote("The secret of getting ahead is getting started.", "Mark Twain"),
+    Quote("It always seems impossible until it's done.", "Nelson Mandela"),
+    Quote("Your lungs are learning to breathe clean air again. Honor them.", "Wellness Focus"),
+    Quote("Every minute you resist a craving is a victory for your future self.", "Daily Habit Support"),
+    Quote("Quitting smoking is a marathon of small moments. Win this moment.", "Mindfulness Guide"),
+    Quote("You are stronger than a small paper cylinder filled with dried leaves.", "Inspirational Truth"),
+    Quote("The money you save is a bonus; the life you save is the ultimate reward.", "Financial & Health Truth"),
+    Quote("Every breath of clean air is a pledge to live longer, happier, and free.", "Clean Air Initiative"),
+    Quote("Believe you can and you're halfway there.", "Theodore Roosevelt"),
+    Quote("Your body is your temple. Keep it clean and smoke-free.", "Healthy Wisdom"),
+    Quote("Cravings are temporary. Your health and freedom are permanent.", "Recovery Path"),
+    Quote("You don't need a cigarette to cope. You have strength, breathing, and courage.", "Inner Strength Guide")
+)
+
+@Composable
+fun MotivationalQuoteCard(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val currentDayOfYear = java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_YEAR)
+    
+    // Default daily index based on day of the year
+    var quoteIndex by remember { mutableStateOf(currentDayOfYear % smokeFreeQuotes.size) }
+    val currentQuote = smokeFreeQuotes[quoteIndex]
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)),
+        shape = RoundedCornerShape(24.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Lightbulb,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text(
+                        text = "DAILY INSPIRATION",
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        letterSpacing = 1.sp
+                    )
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Refresh/Rotator Button
+                    IconButton(
+                        onClick = {
+                            var nextIndex = (quoteIndex + 1) % smokeFreeQuotes.size
+                            if (nextIndex == (currentDayOfYear % smokeFreeQuotes.size) && smokeFreeQuotes.size > 1) {
+                                nextIndex = (nextIndex + 1) % smokeFreeQuotes.size
+                            }
+                            quoteIndex = nextIndex
+                        },
+                        modifier = Modifier
+                            .size(32.dp)
+                            .testTag("rotate_quote_button")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = "Rotate Quote",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+
+                    // Share Button
+                    IconButton(
+                        onClick = {
+                            val shareIntent = android.content.Intent().apply {
+                                action = android.content.Intent.ACTION_SEND
+                                putExtra(android.content.Intent.EXTRA_TEXT, "\"${currentQuote.text}\" — ${currentQuote.author} (via Quit Smoking Tracker)")
+                                type = "text/plain"
+                            }
+                            context.startActivity(android.content.Intent.createChooser(shareIntent, "Share Daily Inspiration"))
+                        },
+                        modifier = Modifier
+                            .size(32.dp)
+                            .testTag("share_quote_button")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "Share Quote",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+            }
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Text(
+                    text = "\"${currentQuote.text}\"",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium,
+                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    lineHeight = 22.sp
+                )
+                Text(
+                    text = "— ${currentQuote.author}",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.align(Alignment.End)
+                )
+            }
         }
     }
 }
