@@ -1567,7 +1567,7 @@ fun AdMobBanner(modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "SUPPORT SPONSOR (TEST AD)",
+                text = "SUPPORT SPONSOR",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                 fontWeight = FontWeight.Bold,
@@ -1580,7 +1580,11 @@ fun AdMobBanner(modifier: Modifier = Modifier) {
                 factory = { context ->
                     AdView(context).apply {
                         setAdSize(AdSize.BANNER)
-                        adUnitId = "ca-app-pub-3940256099942544/6300978111" // Standard Google Test Banner Unit ID
+                        adUnitId = try {
+                            com.example.BuildConfig.ADMOB_BANNER_AD_UNIT_ID.ifEmpty { "ca-app-pub-3551045109813269/7632141647" }
+                        } catch (e: Exception) {
+                            "ca-app-pub-3551045109813269/7632141647"
+                        }
                         loadAd(AdRequest.Builder().build())
                     }
                 }
